@@ -10,6 +10,40 @@ Diese API bietet REST-Endpunkte für den Austausch von Zeitreihendaten im deutsc
 - OBIS-Code-Unterstützung für Smart-Meter-Integration
 - OAuth 2.0 Sicherheit
 - OpenAPI 3.0 Spezifikation
+- Web-basierter Formel-Builder (React Frontend)
+
+## Quick Start
+
+Das gesamte System (Backend API + Frontend UI) kann mit einem Befehl gestartet werden:
+
+```bash
+docker compose up
+```
+
+Nach dem Start sind folgende Services verfügbar:
+
+- **Frontend UI**: http://localhost:3000
+  - Visueller Formel-Builder
+  - Dashboard mit Statistiken
+  - Formelverwaltung
+
+- **Backend API**: http://localhost:8000
+  - REST API Endpunkte
+  - Health Check: http://localhost:8000/health
+  - API Dokumentation in `mabis-timeseries-api.yaml`
+
+**Erste Schritte:**
+1. Öffnen Sie http://localhost:3000 im Browser
+2. Navigieren Sie zu "Formel Builder"
+3. Wählen Sie eine Formel-Vorlage (z.B. "BESS Batterieladung")
+4. Passen Sie die Parameter an
+5. Speichern Sie die Formel
+
+### Demo Client ausführen
+
+```bash
+docker compose --profile demo up
+```
 
 ## API-Endpunkte
 
