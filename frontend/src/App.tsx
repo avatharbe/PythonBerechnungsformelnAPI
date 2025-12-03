@@ -1,7 +1,8 @@
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
-import { Home, FileText, Calculator, Activity } from 'lucide-react';
+import { Home, FileText, Calculator, Activity, Inbox } from 'lucide-react';
 import FormulaBuilder from './pages/FormulaBuilder';
 import FormulaList from './pages/FormulaList';
+import FormulaReceiver from './pages/FormulaReceiver';
 import Dashboard from './pages/Dashboard';
 import './index.css';
 
@@ -23,11 +24,14 @@ function App() {
                   <NavLink to="/" icon={<Home size={18} />}>
                     Dashboard
                   </NavLink>
-                  <NavLink to="/formulas" icon={<FileText size={18} />}>
-                    Formeln
-                  </NavLink>
                   <NavLink to="/builder" icon={<Calculator size={18} />}>
-                    Neue Formel
+                    Sender (MSB)
+                  </NavLink>
+                  <NavLink to="/receiver" icon={<Inbox size={18} />}>
+                    Empfänger (NB)
+                  </NavLink>
+                  <NavLink to="/formulas" icon={<FileText size={18} />}>
+                    Alle Formeln
                   </NavLink>
                 </div>
               </div>
@@ -45,8 +49,9 @@ function App() {
         <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
           <Routes>
             <Route path="/" element={<Dashboard />} />
-            <Route path="/formulas" element={<FormulaList />} />
             <Route path="/builder" element={<FormulaBuilder />} />
+            <Route path="/receiver" element={<FormulaReceiver />} />
+            <Route path="/formulas" element={<FormulaList />} />
           </Routes>
         </main>
       </div>
