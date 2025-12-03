@@ -1,16 +1,21 @@
 openapi: 3.0.3
 info:
-  title: MaBiS Time Series API
+  title: MaBiS Zeitreihen API mit Formelunterstützung
   version: 1.0.0
   description: |
-    REST API for exchanging time series data in the German energy market (MaBiS).
-    This API provides functionality equivalent to UTILTS EDIFACT messages.
-    
-    **Key Features:**
-    - Submit metering values and time series
-    - Retrieve aggregated balancing group data
-    - Support for different measurement types and quality indicators
-    
+    REST API für den Austausch von Zeitreihendaten im deutschen Energiemarkt (MaBiS).
+    Diese API bietet Funktionalität äquivalent zu UTILTS EDIFACT-Nachrichten mit erweiterten
+    Formelberechnungsfunktionen für Bilanzierung, Netznutzung und Eigenverbrauch.
+
+    **Hauptmerkmale:**
+    - Zeitreihendaten und Messwerte übermitteln
+    - Aggregierte Bilanzkreisdaten abrufen
+    - Unterstützung für verschiedene Messtypen und Qualitätsindikatoren
+    - 11 ÜNB-geforderte Berechnungsfunktionen
+    - Verschachtelte Formelausdrücke für komplexe Berechnungen
+    - OBIS-Code-Integration für Smart-Meter-Daten
+    - Zählpunkt-Referenzen und Verlustfaktor-Berechnungen
+
   contact:
     name: MaBiS-Hub API Support
     email: api-support@mabis-hub.de
