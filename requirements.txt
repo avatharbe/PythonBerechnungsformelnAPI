@@ -4,6 +4,9 @@
 # HTTP client library for API requests
 requests>=2.31.0,<3.0.0
 
+# Flask for mock API server
+Flask>=3.0.0,<4.0.0
+
 # Additional development dependencies (optional)
 # Uncomment if needed for development/testing:
 
