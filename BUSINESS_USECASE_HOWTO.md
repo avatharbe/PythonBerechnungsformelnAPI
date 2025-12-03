@@ -33,9 +33,13 @@
 ### Bisherige Probleme (EDIFACT UTILTS)
 
 ❌ Formeln mussten separat in Excel oder Systemen gepflegt werden
+
 ❌ Berechnungsergebnisse wurden übermittelt, aber nicht die Formeln selbst
+
 ❌ Fehleranfällig bei manueller Berechnung
+
 ❌ Keine Standardisierung der Formeln zwischen Marktteilnehmern
+
 ❌ Schwierig nachzuvollziehen, wie Werte berechnet wurden
 
 ---
