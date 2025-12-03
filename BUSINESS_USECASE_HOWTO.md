@@ -73,14 +73,21 @@ Die Lösung besteht aus drei Komponenten:
 
 ### Vorteile
 
-✅ **Formeln als Code:** Berechnungslogik wird zusammen mit Daten übermittelt
-✅ **Automatisierte Berechnung:** API führt Berechnungen durch, kein manueller Eingriff
-✅ **OBIS-Code-Integration:** Direkte Zuordnung zu physischen Zählpunkten
-✅ **Versionierung:** Formeln können versioniert und nachvollzogen werden
-✅ **Standard-Funktionen:** 11 ÜNB-geforderte Funktionen bereits implementiert
-✅ **RESTful:** Moderne Integration in bestehende IT-Systeme
-✅ **Benutzerfreundlich:** Keine JSON-Kenntnisse erforderlich durch Frontend
-✅ **Self-Service:** Anlagenbetreiber können eigene Formeln erstellen
+**Formeln als Code:** Berechnungslogik wird zusammen mit Daten übermittelt
+
+**Automatisierte Berechnung:** API führt Berechnungen durch, kein manueller Eingriff
+
+**OBIS-Code-Integration:** Direkte Zuordnung zu physischen Zählpunkten
+
+**Versionierung:** Formeln können versioniert und nachvollzogen werden
+
+**Standard-Funktionen:** 11 ÜNB-geforderte Funktionen bereits implementiert
+
+**RESTful:** Moderne Integration in bestehende IT-Systeme
+
+**Benutzerfreundlich:** Keine JSON-Kenntnisse erforderlich durch Frontend
+
+**Self-Service:** Anlagenbetreiber können eigene Formeln erstellen
 
 ---
 
