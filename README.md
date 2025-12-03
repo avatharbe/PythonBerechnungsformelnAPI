@@ -1,346 +1,392 @@
-# MaBiS Time Series REST API Prototype
+# MaBiS Zeitreihen REST API mit Formelunterstützung
 
-## Overview
+## Überblick
 
-This prototype demonstrates a modern REST API approach for exchanging time series data in the German energy market, providing functionality equivalent to the UTILTS EDIFACT format.
+Diese API bietet REST-Endpunkte für den Austausch von Zeitreihendaten im deutschen Energiemarkt mit erweiterten Formelberechnungsfunktionen für Bilanzierung, Netznutzung und Eigenverbrauchsberechnungen.
 
-## Design Principles
+**Hauptmerkmale:**
+- RESTful Zeitreihendatenaustausch (UTILTS EDIFACT-Äquivalent)
+- Formel-API für ÜNB-geforderte Berechnungen
+- OBIS-Code-Unterstützung für Smart-Meter-Integration
+- OAuth 2.0 Sicherheit
+- OpenAPI 3.0 Spezifikation
 
-### 1. **Hybrid Approach: REST + CIM Semantics**
+## API-Endpunkte
 
-This API combines the best of both worlds:
-- **External Interface**: RESTful JSON APIs (developer-friendly)
-- **Internal Data Model**: CIM-aligned semantics (ENTSO-E compatible)
-- **Translation Layer**: Can map to/from CIM XML when needed
+### Zeitreihen-Operationen
 
-### 2. **Alignment with Standards**
+- `POST /time-series` - Zeitreihendaten übermitteln
+- `GET /time-series` - Zeitreihen mit Filtern abfragen
+- `GET /time-series/{timeSeriesId}` - Bestimmte Zeitreihe abrufen
 
-#### German Energy Market (EDI@Energy)
-- Market Location IDs (Marktlokations-ID / MRID format)
-- OBIS codes for smart meter data
-- German market roles (MSB, NB, LF, BKV, BA, MV)
-- Balancing group identifiers
+### Formel-Operationen
 
-#### International Standards
-- ISO 8601 / RFC 3339 for date/time
-- RFC 7807 for error responses (Problem Details)
-- OAuth 2.0 for security
-- OpenAPI 3.0 for API specification
+- `POST /formulas` - Formeldefinitionen übermitteln
+- `GET /formulas` - Verfügbare Formeln auflisten
+- `GET /formulas/{formulaId}` - Bestimmte Formel abrufen
 
-#### ENTSO-E/CIM Compatibility
-- MRID format compatible with IEC 61970/61968
-- EIC codes for market participants
-- Data model can be mapped to CIM TimeSeries
+### Berechnungs-Operationen
 
-### 3. **Key Features Mimicking UTILTS**
+- `POST /calculations` - Formel auf Zeitreihendaten ausführen
+- `GET /calculations/{calculationId}` - Berechnungsergebnisse abrufen
 
-| UTILTS Segment | REST API Equivalent | Description |
+Siehe die OpenAPI-Spezifikation (`mabis-timeseries-api.yaml`) für detaillierte Endpunkt-Dokumentation.
+
+## Formel-API
+
+### Überblick
+
+Die Formel-API erweitert die grundlegende Zeitreihenfunktionalität, indem sie Nutzern ermöglicht, Berechnungsformeln für Zeitreihendaten zu definieren und auszuführen. Dies ist essentiell für deutsche Energiemarkt-Berechnungen wie Bilanzierung, Netznutzung, Eigenverbrauch und Verlustberechnungen.
+
+### Hauptmerkmale
+
+- **11 ÜNB-geforderte Funktionen**: Unterstützung aller von deutschen ÜNBs geforderten Berechnungsfunktionen
+- **Verschachtelte Ausdrücke**: Formeln können verschachtelte Unterausdrücke für komplexe Berechnungen enthalten
+- **OBIS-Code-Unterstützung**: Integration mit Smart-Meter OBIS-Codes
+- **Zählpunkt-Referenzen**: Direkte Referenzen zu physischen Zählpunkten
+- **Verlustfaktor-Berechnungen**: Eingebaute Unterstützung für Netzverlustberechnungen
+- **Kategorisierung**: Formeln kategorisiert nach Bilanzierungs-/Netznutzungsrelevanz
+
+### Unterstützte Berechnungsfunktionen
+
+| Funktion | Beschreibung | Anwendungsfall |
 |---|---|---|
-| UNH | Message Header | Handled in HTTP headers + message metadata |
-| BGM | Beginning of Message | `messageId` and `messageDate` |
-| NAD | Name and Address | `MarketParticipant` object |
-| IDE | Identity | `timeSeriesId`, `marketLocationId` |
-| DTM | Date/Time/Period | `period` object with ISO 8601 timestamps |
-| SEQ | Sequence Details | `intervals` array with `position` |
-| QTY | Quantity | `quantity` field with decimal format |
-| STS | Status | `quality` and `status` enums |
-| RFF | Reference | `messageId` references |
+| `Anteil_Groesser_Als` | Anteil oberhalb Schwellenwert berechnen | Werte über Grenzwerten identifizieren |
+| `Anteil_Kleiner_Als` | Anteil unterhalb Schwellenwert berechnen | Werte unter Grenzwerten identifizieren |
+| `Groesser_Als` | Vergleichen und größeren Wert zurückgeben | Schwellenwertfilterung |
+| `Round` | Werte auf Genauigkeit runden | Wertrundung |
+| `Conv_RKMG` | Einheiten/Auflösungen konvertieren | Einheitenkonvertierung |
+| `Wenn_Dann` | Wenn-Dann-Sonst bedingte Logik | Bedingte Berechnungen |
+| `IMax` | n-tes Maximum im Intervall berechnen | Tages-/Monatsspitzenerkennung |
+| `IMin` | n-tes Minimum im Intervall berechnen | Tages-/Monatstiefstwerte |
+| `Grp_Sum` | Mehrere Zeitreihen summieren | Aggregation, Bilanzierungssummen |
+| `Quer_Max` | Zeitreihenübergreifendes Maximum | Maximum über mehrere Zeitreihen |
+| `Quer_Min` | Zeitreihenübergreifendes Minimum | Minimum über mehrere Zeitreihen |
 
-## API Endpoints
+### Formelkategorien
 
-### Time Series Operations
+Formeln werden nach ihrem Zweck im Energiemarkt klassifiziert:
 
-#### POST /time-series
-Submit time series data (equivalent to sending UTILTS message)
+- **BILANZIERUNG** - Finanziell relevante Berechnungen
+- **NETZNUTZUNG** - Netzkapazitäts- und Nutzungsberechnungen
+- **BILANZIERUNG_UND_NETZNUTZUNG** - Sowohl bilanzierungs- als auch netznutzungsrelevant
+- **EIGENVERBRAUCH** - Eigenverbrauchsberechnungen
+- **VERLUSTE** - Netzverlustberechnungen
+- **AGGREGATION** - Datenaggregationsformeln
 
-**Request:**
+### Funktionsweise der Formel-API
+
+#### 1. Formeldefinition übermitteln
+
+Zuerst definieren Sie Ihre Berechnungsformel über den `/formulas` Endpunkt:
+
+```bash
+POST /formulas
+```
+
+**Beispiel: Einfache Schwellenwertberechnung**
+
 ```json
 {
-  "messageId": "MSG-2025-12-02-001",
-  "messageDate": "2025-12-02T14:30:00Z",
+  "messageId": "FORM-MSG-20251203001",
+  "messageDate": "2025-12-03T10:30:00Z",
   "sender": {
     "id": "DE0212345678901",
     "role": "MSB"
   },
-  "receiver": {
-    "id": "DE0298765432109",
-    "role": "NB"
-  },
-  "timeSeries": [{
-    "timeSeriesId": "TS-MP10550000000001-A15MIN-20251202",
-    "marketLocationId": "10550000000001",
-    "measurementType": "CONSUMPTION",
-    "unit": "KWH",
-    "resolution": "PT15M",
-    "period": {
-      "start": "2025-12-02T00:00:00Z",
-      "end": "2025-12-03T00:00:00Z"
+  "formulas": [{
+    "formulaId": "FORM-ANTEIL-GT-001",
+    "name": "Anteil oberhalb 100 kWh",
+    "description": "Calculate portion of values above 100 kWh",
+    "expression": {
+      "function": "Anteil_Groesser_Als",
+      "parameters": [
+        {
+          "name": "zeitreihe",
+          "value": "INPUT_TS",
+          "type": "timeseries_ref"
+        },
+        {
+          "name": "grenze",
+          "value": 100.0,
+          "type": "constant"
+        }
+      ]
     },
-    "intervals": [
-      {
-        "position": 1,
-        "start": "2025-12-02T00:00:00Z",
-        "end": "2025-12-02T00:15:00Z",
-        "quantity": "2.456789",
-        "quality": "METERED"
-      }
-    ]
+    "inputTimeSeries": ["INPUT_TS"],
+    "outputUnit": "KWH",
+    "outputResolution": "PT15M",
+    "category": "NETZNUTZUNG",
+    "version": "1.0.0"
   }]
 }
 ```
 
-**Response (201 Created):**
+**Antwort:**
+
 ```json
 {
-  "messageId": "MSG-2025-12-02-001",
-  "acceptanceTime": "2025-12-02T14:30:05Z",
+  "messageId": "FORM-MSG-20251203001",
+  "acceptanceTime": "2025-12-03T10:30:05Z",
   "status": "ACCEPTED",
-  "timeSeriesIds": ["TS-MP10550000000001-A15MIN-20251202"]
+  "formulaIds": ["FORM-ANTEIL-GT-001"]
 }
 ```
 
-#### GET /time-series
-Query time series data with filters
+#### 2. Berechnung ausführen
 
-**Request:**
-```
-GET /time-series?marketLocationId=10550000000001&periodStart=2025-12-01T00:00:00Z&periodEnd=2025-12-02T00:00:00Z&resolution=PT15M
-```
-
-#### GET /time-series/{timeSeriesId}
-Retrieve specific time series by ID
-
-### Balancing Group Operations
-
-#### GET /balancing-groups/{balancingGroupId}/aggregated-values
-Get aggregated balancing group data (Summenzeitreihen)
-
-**Request:**
-```
-GET /balancing-groups/DE123456789012-B/aggregated-values?periodStart=2025-12-01T00:00:00Z&periodEnd=2025-12-02T00:00:00Z&aggregationType=CONSUMPTION
-```
-
-## Data Formats
-
-### Energy-Specific Formats
-
-The API uses custom OpenAPI formats aligned with German energy market standards:
-
-| Format | Type | Description | Example |
-|---|---|---|---|
-| `mrid` | string | Market Resource Identifier | `10550000000001` |
-| `obis` | string | OBIS code for smart meter data | `1-0:1.8.0*255` |
-| `edifact-id` | string | EDIFACT identifier (GLN) | `DE0212345678901` |
-| `balancing-group` | string | Bilanzkreis identifier | `DE123456789012-B` |
-| `ts` | string | Time series ID | `TS-MP10550000000001-A15MIN-20251202` |
-| `ebid` | string | European Energy ID (EIC) | `11X1001234567890U` |
-
-### Decimal Precision
-
-All energy quantities use `string` with `format: decimal` to avoid floating-point precision issues:
-- ✅ Correct: `"2.456789"` (string with 6 decimal places)
-- ❌ Wrong: `2.456789` (number - loses precision)
-
-### Date/Time Format
-
-All timestamps use ISO 8601 / RFC 3339 in UTC:
-- ✅ Correct: `"2025-12-02T14:30:00Z"`
-- ❌ Wrong: `"2025-12-02T14:30:00+01:00"` (avoid local offsets)
-
-## Error Handling (RFC 7807)
-
-All errors follow RFC 7807 Problem Details format:
-
-```json
-{
-  "type": "https://api.mabis-hub.de/problems/validation-error",
-  "title": "Validation Error",
-  "status": 422,
-  "detail": "Time series data validation failed",
-  "instance": "/time-series",
-  "invalidParams": [
-    {
-      "name": "intervals[5].quantity",
-      "reason": "Must have maximum 6 decimal places"
-    }
-  ]
-}
-```
-
-## Security
-
-### OAuth 2.0 Client Credentials Flow
+Wenden Sie die Formel auf tatsächliche Zeitreihendaten über `/calculations` an:
 
 ```bash
-# Get access token
-curl -X POST https://auth.mabis-hub.de/oauth/token \
-  -H "Content-Type: application/x-www-form-urlencoded" \
-  -d "grant_type=client_credentials" \
-  -d "client_id=YOUR_CLIENT_ID" \
-  -d "client_secret=YOUR_CLIENT_SECRET" \
-  -d "scope=timeseries.write"
-
-# Use token
-curl -X POST https://api.mabis-hub.de/v1/time-series \
-  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d @timeseries-data.json
+POST /calculations
 ```
 
-### Required Scopes
-
-- `timeseries.read` - Read time series data
-- `timeseries.write` - Submit time series data
-- `balancing.read` - Read balancing group data
-
-## Comparison: UTILTS vs REST API
-
-### UTILTS EDIFACT (Old)
-```
-UNH+1+UTILTS:D:10A:UN'
-BGM+E40+MSG-2025-12-02-001+9'
-DTM+137:202512021430:203'
-NAD+MS+DE0212345678901::293'
-NAD+NE+DE0298765432109::293'
-IDE+24+10550000000001'
-SEQ++1'
-DTM+163:202512020000:203'
-DTM+164:202512020015:203'
-QTY+220:2.456789:KWH'
-```
-
-### REST API (New)
 ```json
 {
-  "messageId": "MSG-2025-12-02-001",
-  "messageDate": "2025-12-02T14:30:00Z",
-  "sender": {"id": "DE0212345678901", "role": "MSB"},
-  "receiver": {"id": "DE0298765432109", "role": "NB"},
-  "timeSeries": [{
-    "marketLocationId": "10550000000001",
-    "intervals": [{
-      "position": 1,
-      "start": "2025-12-02T00:00:00Z",
-      "end": "2025-12-02T00:15:00Z",
-      "quantity": "2.456789",
-      "quality": "METERED"
-    }]
-  }]
+  "calculationId": "CALC-20251203-001",
+  "requestDate": "2025-12-03T10:45:00Z",
+  "formulaId": "FORM-ANTEIL-GT-001",
+  "inputTimeSeries": {
+    "INPUT_TS": "TS-MP10550000000001-A15MIN-20251202"
+  },
+  "period": {
+    "start": "2025-12-02T00:00:00Z",
+    "end": "2025-12-03T00:00:00Z"
+  },
+  "requestedBy": {
+    "id": "DE0212345678901",
+    "role": "MSB"
+  },
+  "outputTimeSeriesId": "TS-CALC-RESULT-20251202"
 }
 ```
 
-## Advantages Over UTILTS
+**Antwort (202 Accepted - Asynchrone Verarbeitung):**
 
-### Developer Experience
-- ✅ Human-readable JSON vs cryptic EDIFACT syntax
-- ✅ Self-documenting with OpenAPI
-- ✅ Standard HTTP tools (Postman, curl, etc.)
-- ✅ Native support in all modern programming languages
-
-### Technical Benefits
-- ✅ RESTful principles (resources, HTTP methods)
-- ✅ Built-in validation and type checking
-- ✅ Standardized error responses (RFC 7807)
-- ✅ OAuth 2.0 security (industry standard)
-- ✅ Pagination for large datasets
-- ✅ Versioning through URL path
-
-### Operational Improvements
-- ✅ Real-time synchronous responses
-- ✅ Detailed validation errors
-- ✅ Rate limiting and throttling
-- ✅ Modern monitoring and observability
-- ✅ Cloud-native scalability
-
-### CIM Compatibility
-- ✅ Data model can map to IEC 62325 CIM TimeSeries
-- ✅ MRID format compatible with CIM
-- ✅ Can generate CIM XML for ENTSO-E exchanges
-- ✅ European interoperability without being XML-heavy
-
-## Migration Strategy
-
-### Phase 1: Dual Protocol Support
-- Keep EDIFACT UTILTS operational
-- Add REST API in parallel
-- Market participants choose protocol
-- Translation layer maps between formats
-
-### Phase 2: Gradual Migration
-- Incentivize REST API adoption
-- Provide migration tools
-- Support period (6-12 months)
-- Deprecation timeline for UTILTS
-
-### Phase 3: REST-Only
-- Sunset EDIFACT UTILTS
-- Full REST API ecosystem
-- CIM XML gateway for European exchanges
-- Modern development practices
-
-## CIM XML Mapping Example
-
-The REST API data can be mapped to CIM XML for ENTSO-E compatibility:
-
-**REST API Internal:**
 ```json
 {
-  "marketLocationId": "10550000000001",
-  "quantity": "2.456789"
+  "calculationId": "CALC-20251203-001",
+  "status": "PENDING",
+  "acceptedAt": "2025-12-03T10:45:01Z"
 }
 ```
 
-**CIM XML External (when needed):**
-```xml
-<TimeSeries>
-  <mRID>10550000000001</mRID>
-  <businessType>A04</businessType>
-  <Period>
-    <Point>
-      <position>1</position>
-      <quantity>2.456789</quantity>
-    </Point>
-  </Period>
-</TimeSeries>
+#### 3. Berechnungsergebnis abrufen
+
+Überprüfen Sie den Berechnungsstatus und rufen Sie die Ergebnisse ab:
+
+```bash
+GET /calculations/{calculationId}
 ```
 
-## Performance Considerations
+**Antwort:**
 
-### Rate Limits
-- 100 requests per second per client
-- 10,000 time series per request max
-- Burst capacity: 200 requests
+```json
+{
+  "calculationId": "CALC-20251203-001",
+  "formulaId": "FORM-ANTEIL-GT-001",
+  "status": "COMPLETED",
+  "outputTimeSeriesId": "TS-CALC-RESULT-20251202",
+  "completedAt": "2025-12-03T10:45:15Z"
+}
+```
 
-### Pagination
-- Default page size: 100 items
-- Maximum page size: 1000 items
-- Cursor-based pagination for consistency
+Die resultierende Zeitreihe kann dann über die Standard-Zeitreihen-Endpunkte abgerufen werden.
 
-### Caching
-- ETags for conditional requests
-- Cache-Control headers
-- CDN-friendly design
+### Praxisbeispiele für Formeln
 
-## Testing
+#### Beispiel 1: Batterieladung ohne Eigenverbrauch
 
-The OpenAPI specification can be used with tools like:
-- **Swagger UI** - Interactive documentation
-- **Postman** - API testing
-- **Prism** - Mock server generation
-- **OpenAPI Generator** - Client SDK generation
+**Anwendungsfall**: Batterieladungsenergie ohne Eigenverbrauch berechnen (BESS-Anlage)
 
-## Next Steps
+**Formel**: `wenn(W+Z1 – (W+ZEV1 + W+ZE_UW) > 0; W+Z1 – (W+ZEV1 + W+ZE_UW); 0)`
 
-1. **Validate with stakeholders** - TSOs, market participants, BNetzA
-2. **Create reference implementation** - Java/Python sample code
-3. **Define ADRs** - Architecture Decision Records
-4. **Security review** - OAuth setup, rate limiting
-5. **Performance testing** - Load testing scenarios
-6. **Pilot program** - Small-scale rollout
+```json
+{
+  "formulaId": "FORM-BESS-BATT1-CHARGE-OEV",
+  "name": "W+Batt1 oEV",
+  "category": "EIGENVERBRAUCH",
+  "expression": {
+    "function": "Wenn_Dann",
+    "parameters": [
+      {
+        "name": "linieA",
+        "value": { /* nested expression */ },
+        "type": "expression"
+      },
+      {
+        "name": "komparator",
+        "value": ">",
+        "type": "string"
+      },
+      {
+        "name": "linieB",
+        "value": 0,
+        "type": "constant"
+      }
+    ]
+  },
+  "inputMeteringPoints": [
+    {
+      "meteringPointId": "Z1",
+      "obisCode": "1-1:1.29.0",
+      "direction": "CONSUMPTION",
+      "description": "Battery 1 main meter"
+    }
+  ],
+  "outputObisCode": "1-1:1.29.0"
+}
+```
 
-## Contact
+#### Beispiel 2: PV-Bilanzierung mit Verlustfaktor
 
-For questions or feedback on this prototype:
-- Email: api-support@mabis-hub.de
-- GitHub: (repository URL)
-- Confluence: (documentation link)
+**Anwendungsfall**: PV-Einspeisung mit 0,49% Netzverlusten berechnen
+
+**Formel**: `W−3.5.7 * (1 - 0.0049)`
+
+```json
+{
+  "formulaId": "FORM-KW-PV-BILLING-LOSSES",
+  "name": "ΣBil.PV W− mit Verluste",
+  "category": "BILANZIERUNG",
+  "expression": {
+    "function": "Grp_Sum",
+    "parameters": [
+      {
+        "name": "pv_feedin",
+        "value": "W-3.5.7",
+        "type": "timeseries_ref",
+        "obisCode": "1-1:2.29.0",
+        "scalingFactor": 0.9951
+      }
+    ]
+  },
+  "lossFactor": 0.0049,
+  "outputObisCode": "1-1:2.29.0"
+}
+```
+
+#### Beispiel 3: Eigenverbrauchs-Aggregation
+
+**Anwendungsfall**: Alle Eigenverbrauchswerte aggregieren (bilanzierungs- und netznutzungsrelevant)
+
+**Formel**: `W+ZEV1 + W+ZE_UW + W+ZEV2 + W+ZEV3`
+
+```json
+{
+  "formulaId": "FORM-BESS-TOTAL-EV",
+  "name": "ΣEV W+",
+  "category": "BILANZIERUNG_UND_NETZNUTZUNG",
+  "expression": {
+    "function": "Grp_Sum",
+    "parameters": [
+      {"name": "ts1", "value": "W+ZEV1", "type": "timeseries_ref", "obisCode": "1-1:1.29.0"},
+      {"name": "ts2", "value": "W+ZE_UW", "type": "timeseries_ref", "obisCode": "1-1:1.29.0"},
+      {"name": "ts3", "value": "W+ZEV2", "type": "timeseries_ref", "obisCode": "1-1:1.29.0"},
+      {"name": "ts4", "value": "W+ZEV3", "type": "timeseries_ref", "obisCode": "1-1:1.29.0"}
+    ]
+  }
+}
+```
+
+### Verschachtelte Ausdrücke
+
+Formeln unterstützen verschachtelte Ausdrücke für komplexe Berechnungen:
+
+```json
+{
+  "formulaId": "FORM-QUER-MAX-COMPLEX",
+  "name": "Maximum across calculated series",
+  "expression": {
+    "function": "Quer_Max",
+    "parameters": [
+      {
+        "function": "Anteil_Groesser_Als",
+        "parameters": [
+          {"name": "zeitreihe", "value": "TS1", "type": "timeseries_ref"},
+          {"name": "grenze", "value": 50.0, "type": "constant"}
+        ]
+      },
+      {
+        "function": "Anteil_Kleiner_Als",
+        "parameters": [
+          {"name": "zeitreihe", "value": "TS2", "type": "timeseries_ref"},
+          {"name": "grenze", "value": 200.0, "type": "constant"}
+        ]
+      }
+    ]
+  }
+}
+```
+
+### OBIS-Code-Integration
+
+Formeln integrieren mit Smart-Meter OBIS-Codes:
+
+- **1-1:1.29.0**: W+ (Entnahme/Bezug)
+- **1-1:2.29.0**: W− (Einspeisung)
+
+Jeder Parameter kann seinen OBIS-Code zur Rückverfolgbarkeit angeben:
+
+```json
+{
+  "name": "consumption",
+  "value": "W+3.5.1",
+  "type": "timeseries_ref",
+  "obisCode": "1-1:1.29.0"
+}
+```
+
+### Parametertypen
+
+| Typ | Beschreibung | Beispiel |
+|---|---|---|
+| `timeseries_ref` | Referenz zu Zeitreihen-ID | `"INPUT_TS"` |
+| `constant` | Numerische Konstante | `100.0` |
+| `string` | String-Wert (Operatoren, Codes) | `">"` |
+| `expression` | Verschachtelter Formelausdruck | `{function: "..."}` |
+| `percentage` | Prozentwert | `0.49` |
+| `loss_factor` | Verlustfaktor (1 - Prozentsatz) | `0.9951` |
+| `obis_code` | OBIS-Code-Referenz | `"1-1:1.29.0"` |
+| `metering_point_ref` | Zählpunkt-ID | `"ZP_3.5.1"` |
+
+### Formel-Metadaten
+
+Formeln können umfangreiche Metadaten für betriebliche Zwecke enthalten:
+
+```json
+{
+  "metadata": {
+    "balancingGroup": "DE123456789012-B",
+    "facilityType": "BATTERY",
+    "voltageLevel": "30kV",
+    "tsoOperator": "50Hertz",
+    "location": "Staßfurt",
+    "billingRelevant": true,
+    "networkUsageRelevant": true,
+    "lossPercentage": "0.49%"
+  }
+}
+```
+
+### Skalierungsfaktoren und Verlustberechnungen
+
+**Verlustfaktor-Beispiel (0,49% Netzverluste):**
+```json
+{
+  "name": "pv_feedin_with_losses",
+  "value": "W-3.5.7",
+  "type": "timeseries_ref",
+  "scalingFactor": 0.9951
+}
+```
+
+Wobei `scalingFactor = 1 - (lossPercentage / 100) = 1 - 0.0049 = 0.9951`
+
+## Beispiele
+
+Siehe folgende Dateien für vollständige Beispiele:
+- `formula-examples.json` - Grundlegende Formelbeispiele
+- `real-world-formula-examples.json` - Produktionsformeln von 50Hertz-Anlagen
+- `python-client-example.py` - Python-Client-Implementierung
+- `docs/` - Original-Messkonzept-Dokumente (BESS und Kraftwerk)
