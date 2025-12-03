@@ -147,3 +147,8 @@ cython_debug/
 *.bak
 *.tmp
 docs/
+
+# Docker
+*.dockerfile
+docker-compose.override.yml
+.docker/
