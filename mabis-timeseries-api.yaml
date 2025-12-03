@@ -128,7 +128,7 @@ paths:
       parameters:
         - name: marketLocationId
           in: query
-          description: Filter by market location ID (Marktlokations-ID)
+          description: Nach Marktlokations-ID filtern
           schema:
             type: string
             format: mrid
@@ -136,7 +136,7 @@ paths:
         - name: periodStart
           in: query
           required: true
-          description: Start of the time period (inclusive)
+          description: Beginn des Zeitraums (inklusiv)
           schema:
             type: string
             format: date-time
@@ -144,26 +144,26 @@ paths:
         - name: periodEnd
           in: query
           required: true
-          description: End of the time period (exclusive)
+          description: Ende des Zeitraums (exklusiv)
           schema:
             type: string
             format: date-time
             example: "2025-12-02T00:00:00Z"
         - name: measurementType
           in: query
-          description: Filter by measurement type
+          description: Nach Messtyp filtern
           schema:
             $ref: '#/components/schemas/MeasurementType'
         - name: resolution
           in: query
-          description: Time series resolution
+          description: Zeitreihenauflösung
           schema:
             $ref: '#/components/schemas/Resolution'
         - $ref: '#/components/parameters/PageSize'
         - $ref: '#/components/parameters/PageToken'
       responses:
         '200':
-          description: Time series data retrieved successfully
+          description: Zeitreihendaten erfolgreich abgerufen
           content:
             application/json:
               schema:
@@ -179,8 +179,8 @@ paths:
     get:
       tags:
         - Time Series
-      summary: Get specific time series
-      description: Retrieve a specific time series by its unique identifier
+      summary: Bestimmte Zeitreihe abrufen
+      description: Eine bestimmte Zeitreihe anhand ihrer eindeutigen Kennung abrufen
       operationId: getTimeSeries
       security:
         - OAuth2: [timeseries.read]
@@ -188,14 +188,14 @@ paths:
         - name: timeSeriesId
           in: path
           required: true
-          description: Unique time series identifier
+          description: Eindeutige Zeitreihenkennung
           schema:
             type: string
             format: ts
             example: "TS-MP10550000000001-A15MIN-20251202"
       responses:
         '200':
-          description: Time series found
+          description: Zeitreihe gefunden
           content:
             application/json:
               schema:
@@ -209,10 +209,10 @@ paths:
     get:
       tags:
         - Balancing Groups
-      summary: Get aggregated balancing group values
+      summary: Aggregierte Bilanzkreiswerte abrufen
       description: |
-        Retrieve aggregated time series for a balancing group.
-        Equivalent to UTILTS aggregated time series (Summenzeitreihen).
+        Aggregierte Zeitreihen für einen Bilanzkreis abrufen.
+        Äquivalent zu UTILTS aggregierten Zeitreihen (Summenzeitreihen).
       operationId: getBalancingGroupAggregation
       security:
         - OAuth2: [timeseries.read]
@@ -220,7 +220,7 @@ paths:
         - name: balancingGroupId
           in: path
           required: true
-          description: Balancing group identifier (Bilanzkreis-ID)
+          description: Bilanzkreis-Kennung
           schema:
             type: string
             format: balancing-group
@@ -240,13 +240,13 @@ paths:
         - name: aggregationType
           in: query
           required: true
-          description: Type of aggregation
+          description: Art der Aggregation
           schema:
             type: string
             enum: [CONSUMPTION, GENERATION, FEED_IN, WITHDRAWAL]
       responses:
         '200':
-          description: Aggregated values retrieved
+          description: Aggregierte Werte abgerufen
           content:
             application/json:
               schema:
@@ -262,8 +262,8 @@ paths:
     post:
       tags:
         - Metering Values
-      summary: Submit metering point values
-      description: Submit metering values for a specific metering point
+      summary: Zählpunktwerte übermitteln
+      description: Messwerte für einen bestimmten Zählpunkt übermitteln
       operationId: submitMeteringValues
       security:
         - OAuth2: [timeseries.write]
@@ -271,7 +271,7 @@ paths:
         - name: meteringPointId
           in: path
           required: true
-          description: Metering point identifier
+          description: Zählpunkt-Kennung
           schema:
             type: string
             format: mrid
@@ -283,7 +283,7 @@ paths:
               $ref: '#/components/schemas/MeteringValuesSubmission'
       responses:
         '201':
-          description: Values accepted
+          description: Werte akzeptiert
           content:
             application/json:
               schema:
@@ -400,29 +400,29 @@ paths:
       parameters:
         - name: name
           in: query
-          description: Filter by formula name
+          description: Nach Formelname filtern
           schema:
             type: string
         - name: createdBy
           in: query
-          description: Filter by creator ID
+          description: Nach Ersteller-ID filtern
           schema:
             type: string
         - name: pageSize
           in: query
-          description: Number of items per page
+          description: Anzahl der Elemente pro Seite
           schema:
             type: integer
             default: 100
             maximum: 1000
         - name: cursor
           in: query
-          description: Pagination cursor
+          description: Paginierungs-Cursor
           schema:
             type: string
       responses:
         '200':
-          description: List of formulas
+          description: Liste der Formeln
           content:
             application/json:
               schema:
@@ -436,8 +436,8 @@ paths:
     get:
       tags:
         - Formulas
-      summary: Get formula by ID
-      description: Retrieve a specific formula definition
+      summary: Formel nach ID abrufen
+      description: Eine bestimmte Formeldefinition abrufen
       operationId: getFormula
       security:
         - OAuth2: [formulas.read]
@@ -445,12 +445,12 @@ paths:
         - name: formulaId
           in: path
           required: true
-          description: Formula identifier
+          description: Formel-Kennung
           schema:
             type: string
       responses:
         '200':
-          description: Formula retrieved
+          description: Formel abgerufen
           content:
             application/json:
               schema:
@@ -519,12 +519,12 @@ paths:
         - name: calculationId
           in: path
           required: true
-          description: Calculation identifier
+          description: Berechnungs-Kennung
           schema:
             type: string
       responses:
         '200':
-          description: Calculation result
+          description: Berechnungsergebnis
           content:
             application/json:
               schema:
@@ -536,34 +536,34 @@ components:
   securitySchemes:
     OAuth2:
       type: oauth2
-      description: OAuth2 security scheme for MaBiS-Hub
+      description: OAuth2-Sicherheitsschema für MaBiS-Hub
       flows:
         clientCredentials:
           tokenUrl: https://auth.mabis-hub.de/oauth/token
           scopes:
-            timeseries.read: Read time series data
-            timeseries.write: Submit time series data
-            balancing.read: Read balancing group data
-            formulas.read: Read formula definitions
-            formulas.write: Submit formula definitions
-            calculations.read: Read calculation results
-            calculations.execute: Execute calculations
+            timeseries.read: Zeitreihendaten lesen
+            timeseries.write: Zeitreihendaten übermitteln
+            balancing.read: Bilanzkreisdaten lesen
+            formulas.read: Formeldefinitionen lesen
+            formulas.write: Formeldefinitionen übermitteln
+            calculations.read: Berechnungsergebnisse lesen
+            calculations.execute: Berechnungen ausführen
 
   parameters:
     PageSize:
       name: pageSize
       in: query
-      description: Number of items per page (max 1000)
+      description: Anzahl der Elemente pro Seite (max. 1000)
       schema:
         type: integer
         minimum: 1
         maximum: 1000
         default: 100
-    
+
     PageToken:
       name: pageToken
       in: query
-      description: Token for retrieving the next page
+      description: Token zum Abrufen der nächsten Seite
       schema:
         type: string
 
@@ -579,12 +579,12 @@ components:
       properties:
         messageId:
           type: string
-          description: Unique message identifier
+          description: Eindeutige Nachrichten-Kennung
           example: "MSG-2025-12-02-001"
         messageDate:
           type: string
           format: date-time
-          description: Message creation timestamp
+          description: Zeitstempel der Nachrichtenerstellung
         sender:
           $ref: '#/components/schemas/MarketParticipant'
         receiver:
@@ -1383,54 +1383,54 @@ components:
 
   responses:
     BadRequest:
-      description: Bad request - invalid input
+      description: Fehlerhafte Anfrage - ungültige Eingabe
       content:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/ProblemDetail'
           example:
             type: "https://api.mabis-hub.de/problems/bad-request"
-            title: "Bad Request"
+            title: "Fehlerhafte Anfrage"
             status: 400
-            detail: "The request contains invalid parameters"
+            detail: "Die Anfrage enthält ungültige Parameter"
             instance: "/time-series"
 
     Unauthorized:
-      description: Unauthorized - invalid or missing authentication
+      description: Nicht autorisiert - ungültige oder fehlende Authentifizierung
       content:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/ProblemDetail'
 
     NotFound:
-      description: Resource not found
+      description: Ressource nicht gefunden
       content:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/ProblemDetail'
 
     ValidationError:
-      description: Unprocessable Entity - validation failed
+      description: Nicht verarbeitbare Entität - Validierung fehlgeschlagen
       content:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/ProblemDetail'
           example:
             type: "https://api.mabis-hub.de/problems/validation-error"
-            title: "Validation Error"
+            title: "Validierungsfehler"
             status: 422
-            detail: "Time series data validation failed"
+            detail: "Zeitreihendaten-Validierung fehlgeschlagen"
             invalidParams:
               - name: "intervals[5].quantity"
-                reason: "Must have maximum 6 decimal places"
+                reason: "Muss maximal 6 Dezimalstellen haben"
               - name: "intervals[12].quality"
-                reason: "Invalid quality indicator"
+                reason: "Ungültiger Qualitätsindikator"
 
     TooManyRequests:
-      description: Too many requests - rate limit exceeded
+      description: Zu viele Anfragen - Ratenlimit überschritten
       headers:
         Retry-After:
-          description: Seconds until rate limit resets
+          description: Sekunden bis zum Zurücksetzen des Ratenlimits
           schema:
             type: integer
       content:
@@ -1439,7 +1439,7 @@ components:
             $ref: '#/components/schemas/ProblemDetail'
 
     InternalServerError:
-      description: Internal server error
+      description: Interner Serverfehler
       content:
         application/problem+json:
           schema:
