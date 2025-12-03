@@ -71,7 +71,7 @@ Thumbs.db
 .DS_Store
 
 # Project-specific documentation (optional - include if needed in container)
-README.md
+docs/README.md
 BUSINESS_USECASE_HOWTO.md
 DEMO_QUICKSTART.md
 PYTHON_CHECK_SUMMARY.md
