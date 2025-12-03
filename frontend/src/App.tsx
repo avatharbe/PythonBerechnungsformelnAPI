@@ -1,9 +1,10 @@
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
-import { Home, FileText, Calculator, Activity, Inbox } from 'lucide-react';
+import { Home, FileText, Calculator, Activity, Inbox, Network } from 'lucide-react';
 import FormulaBuilder from './pages/FormulaBuilder';
 import FormulaList from './pages/FormulaList';
 import FormulaReceiver from './pages/FormulaReceiver';
 import Dashboard from './pages/Dashboard';
+import Architecture from './pages/Architecture';
 import './index.css';
 
 function App() {
@@ -16,22 +17,28 @@ function App() {
             <div className="flex justify-between h-16">
               <div className="flex">
                 <div className="flex-shrink-0 flex items-center">
-                  <h1 className="text-2xl font-bold text-primary-600">
-                    MaBiS Formula Builder
-                  </h1>
+                  <div>
+                    <h1 className="text-2xl font-bold text-primary-600">
+                      MaBiS Hub
+                    </h1>
+                    <p className="text-xs text-gray-500">Formula Registry API - Proof of Concept</p>
+                  </div>
                 </div>
                 <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
                   <NavLink to="/" icon={<Home size={18} />}>
                     Dashboard
                   </NavLink>
+                  <NavLink to="/architecture" icon={<Network size={18} />}>
+                    Architektur
+                  </NavLink>
                   <NavLink to="/builder" icon={<Calculator size={18} />}>
-                    Sender (MSB)
+                    Formel einreichen
                   </NavLink>
                   <NavLink to="/receiver" icon={<Inbox size={18} />}>
-                    Empfänger (NB)
+                    Hub Operationen
                   </NavLink>
                   <NavLink to="/formulas" icon={<FileText size={18} />}>
-                    Alle Formeln
+                    Formel-Registry
                   </NavLink>
                 </div>
               </div>
@@ -49,6 +56,7 @@ function App() {
         <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
           <Routes>
             <Route path="/" element={<Dashboard />} />
+            <Route path="/architecture" element={<Architecture />} />
             <Route path="/builder" element={<FormulaBuilder />} />
             <Route path="/receiver" element={<FormulaReceiver />} />
             <Route path="/formulas" element={<FormulaList />} />

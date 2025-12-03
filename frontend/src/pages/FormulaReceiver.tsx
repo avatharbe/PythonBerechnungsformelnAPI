@@ -35,12 +35,12 @@ export default function FormulaReceiver() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Formelempfang (Netzbetreiber)</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Hub Operationen - Formelvalidierung</h1>
           <p className="mt-2 text-gray-600">
-            Empfangene Formeln von Messstellenbetreibern - Validierung und Bestätigung
+            Zentrale Validierung und Verwaltung eingereichter Formeln
           </p>
           <p className="mt-1 text-sm text-gray-500">
-            {formulas.length} empfangene Formel{formulas.length !== 1 ? 'n' : ''}
+            {formulas.length} eingereichte Formel{formulas.length !== 1 ? 'n' : ''} im Hub
           </p>
         </div>
         <button
@@ -54,9 +54,9 @@ export default function FormulaReceiver() {
       {formulas.length === 0 ? (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
           <AlertTriangle className="mx-auto mb-4 text-yellow-500" size={48} />
-          <p className="text-gray-500">Keine Formeln empfangen</p>
+          <p className="text-gray-500">Keine Formeln im Hub</p>
           <p className="mt-2 text-sm text-gray-400">
-            Warten auf Übermittlung von Messstellenbetreibern
+            Warten auf Einreichung von Marktteilnehmern (MSBs)
           </p>
         </div>
       ) : (
@@ -90,8 +90,13 @@ function ReceivedFormulaCard({
   onView: () => void;
 }) {
   // Validate formula structure
+  const hasCustomExpression = formula.metadata && (formula.metadata as any).customExpression;
   const isValid = formula.formulaId && formula.expression && formula.expression.function;
-  const hasAllParameters = formula.inputTimeSeries && formula.inputTimeSeries.length > 0;
+
+  // More lenient validation for custom expressions - they may not have inputTimeSeries
+  const hasAllParameters = hasCustomExpression ||
+    (formula.inputTimeSeries && formula.inputTimeSeries.length > 0) ||
+    (formula.expression?.parameters && formula.expression.parameters.length > 0);
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
@@ -153,6 +158,12 @@ function ReceivedFormulaCard({
               label="Kategorie"
               valid={!!formula.category}
             />
+            {hasCustomExpression && (
+              <div className="flex items-center space-x-1">
+                <CheckCircle className="text-purple-500" size={12} />
+                <span className="text-purple-700">Freie Formel</span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -192,11 +203,27 @@ function FormulaDetailModal({ formula, onClose }: { formula: Formula; onClose: (
         onClick={(e) => e.stopPropagation()}
       >
         <div className="p-6 border-b border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-900">Empfangene Formel: {formula.name}</h2>
-          <p className="text-sm text-gray-500 mt-1">ID: {formula.formulaId}</p>
+          <h2 className="text-2xl font-bold text-gray-900">Hub-Formel: {formula.name}</h2>
+          <p className="text-sm text-gray-500 mt-1">Formel-ID: {formula.formulaId}</p>
         </div>
 
         <div className="p-6 space-y-6">
+          {/* Custom Expression (if present) */}
+          {formula.metadata && (formula.metadata as any).customExpression && (
+            <div className="bg-purple-50 border-2 border-purple-300 rounded-lg p-4">
+              <h3 className="text-sm font-semibold text-purple-900 mb-2 flex items-center gap-2">
+                <CheckCircle className="text-purple-600" size={16} />
+                Freie mathematische Formel
+              </h3>
+              <pre className="bg-white p-3 rounded border border-purple-200 font-mono text-sm text-purple-900 overflow-x-auto">
+                {(formula.metadata as any).customExpression}
+              </pre>
+              <p className="text-xs text-purple-700 mt-2">
+                Diese Formel verwendet eine freie mathematische Notation
+              </p>
+            </div>
+          )}
+
           {/* Basic Info */}
           <div>
             <h3 className="text-sm font-medium text-gray-700 mb-2">Grundinformationen</h3>
@@ -285,7 +312,7 @@ function FormulaDetailModal({ formula, onClose }: { formula: Formula; onClose: (
           {/* Complete JSON */}
           <div>
             <h3 className="text-sm font-medium text-gray-700 mb-2">
-              Vollständige JSON-Übermittlung
+              Vollständige JSON-Struktur (Hub-Registry)
             </h3>
             <pre className="bg-gray-900 text-green-400 p-4 rounded text-xs overflow-auto max-h-96">
               {JSON.stringify(formula, null, 2)}
@@ -301,10 +328,24 @@ function FormulaDetailModal({ formula, onClose }: { formula: Formula; onClose: (
             Schließen
           </button>
           <div className="space-x-2">
-            <button className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors">
+            <button
+              onClick={() => {
+                // In production, this would send a rejection API call
+                alert(`Formel "${formula.name}" wurde abgelehnt.\n\nIn der Produktion würde hier eine API-Anfrage an den MaBiS Hub gesendet werden.`);
+                onClose();
+              }}
+              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+            >
               Ablehnen
             </button>
-            <button className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors">
+            <button
+              onClick={() => {
+                // In production, this would send an acceptance API call
+                alert(`Formel "${formula.name}" wurde akzeptiert und bestätigt!\n\nIn der Produktion würde hier eine API-Anfrage an den MaBiS Hub gesendet werden.`);
+                onClose();
+              }}
+              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+            >
               Akzeptieren & Bestätigen
             </button>
           </div>

@@ -47,8 +47,11 @@ export default function Dashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="mt-2 text-gray-600">Überblick über Ihre MaBiS Formeln und Berechnungen</p>
+        <h1 className="text-3xl font-bold text-gray-900">MaBiS Hub - Zentrale Formel-Registry</h1>
+        <p className="mt-2 text-gray-600">REST API statt EDIFACT UTILTS für Formelübermittlung</p>
+        <p className="mt-1 text-sm text-gray-500">
+          Zentrale Plattform für Formelübermittlung zwischen Marktteilnehmern (MSBs, NBs, ÜNBs)
+        </p>
       </div>
 
       {/* Stats Grid */}

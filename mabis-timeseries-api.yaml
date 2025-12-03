@@ -1090,6 +1090,9 @@ components:
             - EIGENVERBRAUCH
             - VERLUSTE
             - AGGREGATION
+            - MATHEMATISCH
+            - TRANSFORMATION
+            - SONSTIGES
           description: |
             Formula category for billing/settlement purposes:
             - BILANZIERUNG: Billing/settlement relevant (Bil)
@@ -1098,6 +1101,9 @@ components:
             - EIGENVERBRAUCH: Self-consumption calculations (oEV)
             - VERLUSTE: Loss calculations (Verluste)
             - AGGREGATION: Aggregation formulas (Σ)
+            - MATHEMATISCH: Pure mathematical formulas (e.g., algebraic, trigonometric)
+            - TRANSFORMATION: Data transformation formulas
+            - SONSTIGES: Other custom formulas
         inputMeteringPoints:
           type: array
           items:
@@ -1139,6 +1145,7 @@ components:
             - facilityType: BATTERY, PV, WIND, KRAFTWERK, etc.
             - voltageLevel: 110kV, 30kV, 20kV, 10kV, 0.4kV
             - tsoOperator: TSO name (e.g., "50Hertz")
+            - customExpression: Free-form mathematical expression (e.g., "y = a*x^3 + b*x^2 + c*x + d")
             - remarks: Additional notes
 
     FormulaExpression:

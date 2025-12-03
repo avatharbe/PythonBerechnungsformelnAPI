@@ -18,7 +18,10 @@ export type FormulaCategory =
   | 'NETZNUTZUNG'
   | 'EIGENVERBRAUCH'
   | 'VERLUSTE'
-  | 'AGGREGATION';
+  | 'AGGREGATION'
+  | 'MATHEMATISCH'
+  | 'TRANSFORMATION'
+  | 'SONSTIGES';
 
 export interface FormulaParameter {
   name?: string;
@@ -71,6 +74,7 @@ export interface FormulaTemplate {
   id: string;
   name: string;
   description: string;
+  descriptionEn: string; // English description
   category: FormulaCategory;
   formula: Partial<Formula>;
   requiredMeteringPoints: number;
