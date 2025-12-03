@@ -393,7 +393,7 @@ Proprietär - 50Hertz Transmission GmbH
 - E-Mail: dev-support@example.com
 
 **Dokumentation:**
-- [MaBiS API Docs](../README.md)
+- [MaBiS API Docs](../docs/README.md)
 - [Business Use Case](../BUSINESS_USECASE_HOWTO.md)
 - [Docker Setup](../DOCKER_README.md)
 
