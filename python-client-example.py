@@ -6,6 +6,8 @@ to submit metering values (equivalent to UTILTS EDIFACT messages) and
 to submit and execute calculation formulas on time series data.
 """
 
+from __future__ import annotations
+
 import requests
 from datetime import datetime, timezone, timedelta
 from typing import List, Dict, Any, Optional, Union
