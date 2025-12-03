@@ -24,34 +24,34 @@ info:
 
 servers:
   - url: https://api.mabis-hub.de/v1
-    description: Production environment
+    description: Produktionsumgebung
   - url: https://api-test.mabis-hub.de/v1
-    description: Test environment1
+    description: Testumgebung
 
 security:
   - OAuth2: [timeseries.read, timeseries.write]
 
 tags:
   - name: Time Series
-    description: Operations for time series data exchange
+    description: Operationen für Zeitreihendatenaustausch
   - name: Metering Values
-    description: Submit and retrieve metering values
+    description: Messwerte übermitteln und abrufen
   - name: Balancing Groups
-    description: Balancing group aggregation data
+    description: Bilanzkreis-Aggregationsdaten
   - name: Formulas
-    description: Define and manage calculation formulas for time series processing
+    description: Berechnungsformeln für Zeitreihenverarbeitung definieren und verwalten (Bilanzierung, Netznutzung, Eigenverbrauch, Verluste)
   - name: Calculations
-    description: Execute formulas on time series data and retrieve results
+    description: Formeln auf Zeitreihendaten ausführen und Ergebnisse abrufen
 
 paths:
   /time-series:
     post:
       tags:
         - Time Series
-      summary: Submit time series data
+      summary: Zeitreihendaten übermitteln
       description: |
-        Submit time series data for metering points. Equivalent to UTILTS message submission.
-        Supports various time series types (metered values, forecasts, schedules).
+        Zeitreihendaten für Zählpunkte übermitteln. Äquivalent zur UTILTS-Nachrichtenübermittlung.
+        Unterstützt verschiedene Zeitreihentypen (gemessene Werte, Prognosen, Fahrpläne).
       operationId: submitTimeSeries
       security:
         - OAuth2: [timeseries.write]
@@ -63,7 +63,7 @@ paths:
               $ref: '#/components/schemas/TimeSeriesSubmission'
             examples:
               meteringValues:
-                summary: 15-minute metering values
+                summary: 15-Minuten Messwerte
                 value:
                   messageId: "MSG-2025-12-02-001"
                   messageDate: "2025-12-02T14:30:00Z"
@@ -95,10 +95,10 @@ paths:
                           quality: "METERED"
       responses:
         '201':
-          description: Time series successfully accepted
+          description: Zeitreihe erfolgreich akzeptiert
           headers:
             Location:
-              description: URL to retrieve the submitted time series
+              description: URL zum Abrufen der übermittelten Zeitreihe
               schema:
                 type: string
                 format: uri
@@ -120,8 +120,8 @@ paths:
     get:
       tags:
         - Time Series
-      summary: Query time series data
-      description: Retrieve time series data with filtering options
+      summary: Zeitreihendaten abfragen
+      description: Zeitreihendaten mit Filteroptionen abrufen
       operationId: queryTimeSeries
       security:
         - OAuth2: [timeseries.read]
@@ -297,10 +297,10 @@ paths:
     post:
       tags:
         - Formulas
-      summary: Submit calculation formula
+      summary: Berechnungsformel übermitteln
       description: |
-        Submit one or more calculation formula definitions that can be applied to time series data.
-        Supports all 11 TSO-required calculation functions including nested expressions.
+        Eine oder mehrere Berechnungsformeldefinitionen übermitteln, die auf Zeitreihendaten angewendet werden können.
+        Unterstützt alle 11 ÜNB-geforderten Berechnungsfunktionen einschließlich verschachtelter Ausdrücke.
       operationId: submitFormula
       security:
         - OAuth2: [formulas.write]
@@ -312,7 +312,7 @@ paths:
               $ref: '#/components/schemas/FormulaSubmission'
             examples:
               simpleFormula:
-                summary: Simple Anteil_Groesser_Als formula
+                summary: Einfache Anteil_Groesser_Als Formel
                 value:
                   messageId: "FORM-MSG-20251203001"
                   messageDate: "2025-12-03T10:30:00Z"
@@ -337,7 +337,7 @@ paths:
                       outputResolution: "PT15M"
                       version: "1.0.0"
               complexFormula:
-                summary: Complex nested Quer_Max formula
+                summary: Komplexe verschachtelte Quer_Max Formel
                 value:
                   messageId: "FORM-MSG-20251203002"
                   messageDate: "2025-12-03T10:35:00Z"
@@ -373,10 +373,10 @@ paths:
                       version: "1.0.0"
       responses:
         '201':
-          description: Formula successfully submitted
+          description: Formel erfolgreich übermittelt
           headers:
             Location:
-              description: URL to retrieve the submitted formula
+              description: URL zum Abrufen der übermittelten Formel
               schema:
                 type: string
                 format: uri
@@ -392,8 +392,8 @@ paths:
     get:
       tags:
         - Formulas
-      summary: List formulas
-      description: Retrieve list of available formulas with optional filters
+      summary: Formeln auflisten
+      description: Liste verfügbarer Formeln mit optionalen Filtern abrufen
       operationId: listFormulas
       security:
         - OAuth2: [formulas.read]
@@ -462,10 +462,10 @@ paths:
     post:
       tags:
         - Calculations
-      summary: Execute calculation
+      summary: Berechnung ausführen
       description: |
-        Execute a calculation by applying a formula to time series data.
-        The calculation is processed asynchronously.
+        Eine Berechnung durch Anwendung einer Formel auf Zeitreihendaten ausführen.
+        Die Berechnung wird asynchron verarbeitet.
       operationId: executeCalculation
       security:
         - OAuth2: [calculations.execute]
@@ -490,10 +490,10 @@ paths:
               outputTimeSeriesId: "TS-CALC-RESULT-20251202"
       responses:
         '202':
-          description: Calculation accepted for processing
+          description: Berechnung zur Verarbeitung akzeptiert
           headers:
             Location:
-              description: URL to check calculation status
+              description: URL zur Überprüfung des Berechnungsstatus
               schema:
                 type: string
                 format: uri
@@ -510,8 +510,8 @@ paths:
     get:
       tags:
         - Calculations
-      summary: Get calculation result
-      description: Retrieve the status and result of a calculation
+      summary: Berechnungsergebnis abrufen
+      description: Status und Ergebnis einer Berechnung abrufen
       operationId: getCalculation
       security:
         - OAuth2: [calculations.read]
