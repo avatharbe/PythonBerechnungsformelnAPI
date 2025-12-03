@@ -3,7 +3,9 @@
 ## Geschäftsszenario
 
 **Unternehmen:** Energieversorger mit Batteriespeicheranlage (BESS) in Staßfurt
+
 **Herausforderung:** Korrekte Bilanzierung und Netznutzungsabrechnung für 3 Batteriespeicher mit Eigenverbrauch
+
 **Lösung:** MaBiS Formula API zur automatisierten Berechnung bilanzierungsrelevanter Werte
 
 ---
