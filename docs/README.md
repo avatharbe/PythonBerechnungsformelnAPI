@@ -2,7 +2,8 @@
 
 ## Überblick
 
-Diese API bietet REST-Endpunkte für den Austausch von Zeitreihendaten im deutschen Energiemarkt mit erweiterten Formelberechnungsfunktionen für Bilanzierung, Netznutzung und Eigenverbrauchsberechnungen.
+Diese API bietet REST-Endpunkte für den Austausch von Zeitreihendaten im deutschen Energiemarkt mit erweiterten Formelberechnungsfunktionen für Bilanzierung, Netznutzung und Eigenverbrauchsberechnungen, um UTILTS EDIFACT zu ersetzen.
+
 
 **Hauptmerkmale:**
 - RESTful Zeitreihendatenaustausch (UTILTS EDIFACT-Äquivalent)
